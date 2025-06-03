@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Etransact</title>
+<link rel="icon" href="untitled.jpg">
+<style>
+  /* Reset */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #fff;
+    scroll-behavior: smooth;
+  }
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  /* Header */
+  header.site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background: rgba(15, 32, 60, 0.85);
+    backdrop-filter: saturate(180%) blur(10px);
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  }
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  .nav-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+  }
+  .logo {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #ff6a00;
+    letter-spacing: -0.03em;
+    cursor: pointer;
+    user-select: none;
+  }
+  nav {
+    display: flex;
+    align-items: center;
+  }
+  nav ul {
+    display: flex;
+    list-style: none;
+    gap: 28px;
+    margin: 0;
+    padding: 0;
+     
+  }
+  nav li {
+  }
+  nav a {
+    font-weight: 600;
+    color: #fff;
+    font-size: 1rem;
+    padding: 8px 5px;
+    position: relative;
+    transition: color 0.3s ease;
+  }
+  nav a:hover,
+  nav a:focus {
+    color: #ff9100;
+    outline: none;
+     
+    
+  }
+  nav a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 0;
+    background: #ff6a00;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+  nav a:hover::after,
+  nav a:focus::after {
+    width: 100%;
+  }
+
+  /* Hamburger menu for mobile */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    width: 28px;
+    height: 22px;
+    justify-content: space-between;
+  }
+  .hamburger div {
+    height: 3.9px;
+    background: black;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    width: 100%;
+  }
+  /* Mobile nav open states */
+  nav.open {
+    display: block;
+    position: absolute;
+    top: 60px;
+    left: 333px;
+    right: 0;
+     width: 150px;
+    background: rgba(15, 32, 39, 0.95);
+    backdrop-filter: saturate(180%) blur(12px);
+    padding: 15px 0;
+    border-top: 1px solid #ff6a00;
+    z-index: 1000;
+  }
+  nav.open ul {
+    flex-direction: column;
+    gap: 15px;
+    padding-left: 20px;
+    align-items: center;
+  }
+
+  /* Hero Section */
+  .hero {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex-direction: column;
+    padding: 0 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+    overflow: hidden;
+    margin-top: 60px; /* header height */
+  }
+  .hero h1 {
+    font-size: 4rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    text-shadow: 0 0 10px rgba(255 255 255 / 0.5);
+    animation: fadeInDown 1s ease forwards;
+  }
+  .hero p {
+    font-size: 1.5rem;
+    max-width: 600px;
+    margin-bottom: 40px;
+    font-weight: 300;
+    text-shadow: 0 0 8px rgba(0 0 0 / 0.3);
+    animation: fadeInUp 1s 0.4s ease forwards;
+    opacity: 0;
+  }
+  .hero button.cta {
+    padding: 15px 50px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    background: #ff6a00;
+    border: none;
+    border-radius: 50px;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 6px 25px rgba(255, 106, 0, 0.6);
+    transition: background 0.3s ease, transform 0.3s ease;
+    animation: fadeInUp 1s 0.8s ease forwards;
+    opacity: 0;
+  }
+  .hero button.cta:hover {
+    background: #ff9100;
+    transform: scale(1.05);
+  }
+
+  /* Sections */
+  section {
+    padding: 80px 20px;
+    background: #0f2027;
+    text-align: center;
+  }
+  section.light {
+    background: #f8f9fa;
+    color: #232323;
+  }
+
+  section h2 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+  }
+  section p.lead {
+    font-size: 1.25rem;
+    margin-bottom: 3rem;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    font-weight: 400;
+    opacity: 0.8;
+  }
+
+  /* Features Grid */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+    gap: 40px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .feature {
+    background: #203a43;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.4);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+  }
+  .feature:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 25px rgba(255, 106, 0, 0.75);
+  }
+  .feature svg {
+    width: 64px;
+    height: 64px;
+    fill: #ff6a00;
+    margin-bottom: 20px;
+  }
+  .feature h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .feature p {
+    font-weight: 300;
+    font-size: 1rem;
+    line-height: 1.5;
+    opacity: 0.9;
+  }
+
+  /* Testimonials */
+  .testimonials {
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .testimonial-card {
+    background: #203a43;
+    border-radius: 20px;
+    padding: 40px 30px 30px;
+    color: #ddd;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    font-style: italic;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    position: relative;
+    margin-bottom: 30px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .testimonial-card.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .testimonial-footer {
+    display: flex;
+    align-items: center;
+    margin-top: 30px;
+    font-style: normal;
+  }
+  .testimonial-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #ff6a00;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.2rem;
+    line-height: 50px;
+    text-align: center;
+    margin-right: 15px;
+  }
+  .testimonial-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #ff9100;
+  }
+
+  /* About Us Section */
+  .about-us p {
+    max-width: 700px;
+    margin: 20px auto 0;
+    font-weight: 300;
+    font-size: 1.2rem;
+    line-height: 1.6;
+    opacity: 0.85;
+  }
+
+  /* Contact Us Section */
+  form.contact-form {
+    max-width: 500px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  form.contact-form label {
+    text-align: left;
+    font-weight: 600;
+    color: #ff6a00;
+    font-size: 1rem;
+  }
+  form.contact-form input,
+  form.contact-form textarea {
+    padding: 12px 15px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    resize: vertical;
+    background: #203a43;
+    color: #fff;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.6);
+  }
+  form.contact-form input:focus,
+  form.contact-form textarea:focus {
+    outline: 3px solid #ff9100;
+  }
+  form.contact-form button {
+    padding: 15px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 50px;
+    background: #ff6a00;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(255,106,0,0.7);
+    transition: background 0.3s ease, transform 0.3s ease;
+  }
+  form.contact-form button:hover,
+  form.contact-form button:focus {
+    background: #ff9100;
+    transform: scale(1.05);
+    outline: none;
+  }
+
+  /* Footer */
+  footer {
+    background: #111;
+    padding: 40px 20px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #777;
+  }
+  footer a {
+    color: #ff6a00;
+    margin: 0 10px;
+    transition: color 0.3s ease;
+  }
+  footer a:hover {
+    color: #ff9100;
+  }
+
+  /* Animations */
+  @keyframes fadeInDown {
+    0% {
+      opacity: 0;
+      transform: translateY(-25px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(25px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hero h1 {
+      font-size: 2.8rem;
+    }
+    section h2 {
+      font-size: 2.2rem;
+    }
+
+    nav {
+      display: none;
+      width: 100%;
+    }
+    nav.open {
+      display: block;
+      
+    }
+    nav ul {
+      flex-direction: column !important;
+      gap: 15px !important;
+      padding-left: 20px !important;
+    }
+    .hamburger {
+      display: flex;
+    }
+  }
+
+  /* Button focus */
+  button:focus {
+    outline: 3px solid #ff9100;
+    outline-offset: 3px;
+  }
+</style>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<header class="site-header" role="banner">
+  <div class="container nav-wrapper">
+    <div class="logo" aria-label="Website logo or name">Etransact</div>
+    <nav id="main-nav" role="navigation" aria-label="Primary navigation">
+      <ul>
+        <li><a href="#hero" tabindex="0">Home</a></li>
+        <li><a href="#features" tabindex="0">Features</a></li>
+        <li><a href="#about-us" tabindex="0">About Us</a></li>
+        <li><a href="#contact-us" tabindex="0">Contact Us</a></li>
+         
+      </ul>
+    </nav>
+    <button class="hamburger" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="main-nav" type="button">
+      <div></div>
+      <div></div>
+      <div></div>
+    </button>
+  </div>
+</header>
+
+<header class="hero" id="hero" role="banner" aria-label="Hero section with headline and call to action">
+  <h1>Welcome to Etransact</h1>
+  <p>Discover a new means of recording of goods bought online which you can see anytime you like.</p>
+<a href="login.html">  
+<button class="cta" aria-label="Get started button">Get Started</button>
+</a> 
+</header>
+
+<section id="features" aria-labelledby="features-title" tabindex="0">
+  <div class="container">
+    <h2 id="features-title">Our Amazing Features</h2>
+    <p class="lead">Crafted with care to provide you with an exceptional experience when recording your Goods.</p>
+    <div class="features" role="list">
+      <article class="feature" role="listitem" tabindex="0">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" aria-label="Intuitive design icon">
+          <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+        </svg>
+        <h3>Our Website</h3>
+        <p>Experience a good usefulness of our websites where recording of goods will takes place.</p>
+      </article>
+      <article class="feature" role="listitem" tabindex="0">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" aria-label="Performance optimized icon">
+          <path d="M20 10h-4l-3-4-3 4H4v10h16V10zM7 21v-2h10v2H7z"/>
+        </svg>
+        <h3>Performance Optimized</h3>
+        <p>Enjoy lightning-fast speeds and smooth interactions that make every visit delightful.</p>
+      </article>
+      <article class="feature" role="listitem" tabindex="0">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" aria-label="Secure and reliable icon">
+          <path d="M12 7a2 2 0 100 4 2 2 0 000-4zm0 10c-2.21 0-4-1.79-4-4a4 4 0 018 0c0 2.21-1.79 4-4 4z"/>
+        </svg>
+        <h3>Secure & Reliable</h3>
+        <p>Your Record are private and is our top priorities, with Secure security measures in place.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="about-us" class="light about-us" aria-labelledby="about-us-title" tabindex="0">
+  <div class="container">
+    <h2 id="about-us-title">About Us</h2>
+    <p>
+      We are passionate creators dedicated to crafting registering online experiences. Our team blends creativity, technology, and innovation to deliver websites that leave lasting impressions.
+    </p>
+  </div>
+</section>
+
+<section id="contact-us" aria-labelledby="contact-us-title" tabindex="0">
+  <div class="container">
+    <h2 id="contact-us-title">Contact Us</h2>
+    <p class="lead">Have questions or want to get in touch? We'd love to hear from you!</p>
+    <form class="contact-form" onsubmit="event.preventDefault(); alert('Thank you for contacting us!');">
+      <label for="name">Name</label>
+      <input type="text" id="name" name="name" placeholder="Your name" required />
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" placeholder="Your email address" required />
+
+      <label for="message">Message</label>
+      <textarea id="message" name="message" rows="5" placeholder="Write your message..." required></textarea>
+
+      <button type="submit" aria-label="Send message">Send Message</button>
+    </form>
+  </div>
+</section>
+
+<section class="light" aria-labelledby="testimonials-title" tabindex="0">
+  <div class="container">
+    <h2 id="testimonials-title">What Our Users Say</h2>
+    <div class="testimonials" id="testimonials">
+      <div class="testimonial-card active" tabindex="0">
+        <p>"Absolutely love how intuitive this website is! It is transformed how I record my goods online."</p>
+        <div class="testimonial-footer">
+          <div class="testimonial-avatar">A</div>
+          <div class="testimonial-name">Anna K.</div>
+        </div>
+      </div>
+      <div class="testimonial-card" tabindex="0">
+        <p>"Performance is so smooth! Browsing feels like a breeze, and I appreciate the gorgeous design."</p>
+        <div class="testimonial-footer">
+          <div class="testimonial-avatar">J</div>
+          <div class="testimonial-name">James R.</div>
+        </div>
+      </div>
+      <div class="testimonial-card" tabindex="0">
+        <p>"Security and reliability are unmatched this site truly makes me feel safe while exploring."</p>
+        <div class="testimonial-footer">
+          <div class="testimonial-avatar">M</div>
+          <div class="testimonial-name">Maria S.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer role="contentinfo">
+  <p>copyright &#169 2025 Etransact | 
+    <a href="https:// atanda damilola victor.twitter.com" target="_blank" rel="noopener" aria-label="Twitter">Twitter</a> |
+    <a href="https://atanda damilola victor.facebook.com" target="_blank" rel="noopener" aria-label="Facebook">Facebook</a> |
+    <a href="https://atanda damilola victor.instagram.com" target="_blank" rel="noopener" aria-label="Instagram">Instagram</a>
+  </p>
+</footer>
+
+<script>
+  // Navigation mobile toggle
+  const hamburger = document.querySelector('.hamburger');
+  const nav = document.querySelector('nav#main-nav');
+
+  hamburger.addEventListener('click', () => {
+    const expanded = hamburger.getAttribute('aria-expanded') === 'true' || false;
+    hamburger.setAttribute('aria-expanded', !expanded);
+    nav.classList.toggle('open');
+  });
+
+  // Close menu on link click (mobile)
+  nav.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      if (nav.classList.contains('open')) {
+        nav.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', 'false');
+      }
+    });
+  });
+
+  // Testimonials slider
+  const testimonials = document.querySelectorAll('.testimonial-card');
+  let current = 0;
+
+  function showTestimonial(index) {
+    testimonials.forEach((t, i) => {
+      t.classList.toggle('active', i === index);
+    });
+  }
+
+  function nextTestimonial() {
+    current = (current + 1) % testimonials.length;
+    showTestimonial(current);
+  }
+
+  setInterval(nextTestimonial, 6000);
+
+  // Fade in animations for hero texts on load
+  window.addEventListener('load', () => {
+    document.querySelector('.hero p').style.opacity = 1;
+    document.querySelector('.hero button.cta').style.opacity = 1;
+  });
+</script>
+
+</body>
+</html>
+

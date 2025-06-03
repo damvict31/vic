@@ -1,0 +1,445 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Login</title>
+<link rel="icon" href="untitled.jpg">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+  * {
+    box-sizing: border-box;
+  }
+  body, html {
+    margin: 0; padding: 0; height: 100%;
+    font-family: 'Inter', sans-serif;
+    background: #f5f7fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  .auth-container {
+    background: white;
+    border-radius: 12px;
+    padding: 2.5rem 3rem;
+    box-shadow: 0 12px 35px rgb(0 0 0 / 0.12);
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+  }
+  h2 {
+    margin: 0 0 1.5rem 0;
+    font-weight: 600;
+    color: #1f2937;
+    text-align: center;
+  }
+  form {
+    display: none;
+    flex-direction: column;
+  }
+  form.active {
+    display: flex;
+  }
+  label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #374151;
+    margin-bottom: 0.3rem;
+  }
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    padding: 0.65rem 1rem;
+    margin-bottom: 1.2rem;
+    border-radius: 6px;
+    border: 1.5px solid #d1d5db;
+    font-size: 1rem;
+    transition: border-color 0.25s ease;
+    width: 100%;
+    font-family: inherit;
+  }
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="password"]:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 8px rgb(37 99 235 / 0.3);
+  }
+
+  .password-wrapper {
+    position: relative;
+  }
+  .password-toggle {
+    position: absolute;
+    right: 1rem;
+    top: 43%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+    font-size: 1rem;
+  }
+  .password-toggle:focus {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+  }
+
+  .btn-primary {
+    width: 100%;
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 0.85rem 0;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  .btn-primary:hover,
+  .btn-primary:focus {
+    background-color: #1d4ed8;
+  }
+  .btn-secondary {
+    background: none;
+    border: none;
+    color: #2563eb;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-top: -0.6rem;
+    margin-bottom: 1rem;
+    align-self: flex-end;
+  }
+  .btn-secondary:focus {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+  }
+  .switch-link {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #6b7280;
+  }
+  .switch-link button {
+    background: none;
+    border: none;
+    color: #2563eb;
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0;
+    margin-left: 4px;
+    font-size: 0.9rem;
+  }
+  .switch-link button:focus {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+  }
+  /* Validation message */
+  .error-message {
+    color: #dc2626;
+    font-size: 0.8rem;
+    margin-top: -1rem;
+    margin-bottom: 1rem;
+    display: none;
+  }
+  .error-message.active {
+    display: block;
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    .auth-container {
+      padding: 2rem 1.5rem;
+      width: 90%;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="auth-container" role="main" aria-label="Authentication forms">
+
+  <!-- Login Form -->
+  <form id="login-form" class="active" aria-labelledby="loginTitle" novalidate>
+    <h2 id="loginTitle">Login</h2>
+
+    <label for="login-email">Email</label>
+    <input type="email" id="login-email" name="email" autocomplete="username" placeholder="you@example.com" required aria-required="true" />
+    <div class="error-message" id="login-email-error">Please enter a valid email address.</div>
+
+    <label for="login-password">Password</label>
+    <div class="password-wrapper">
+      <input type="password" id="login-password" name="password" placeholder="Enter password" minlength="6" required aria-required="true" autocomplete="current-password"/>
+      <button type="button" class="password-toggle" aria-label="Toggle password visibility" aria-pressed="false">&#128065;</button>
+    </div>
+    <div class="error-message" id="login-password-error">Password must be at least 6 characters.</div>
+
+    <div class="error-message" id="login-credentials-error">Invalid email or password.</div>
+
+    <button type="button" class="btn-secondary" id="link-to-forgot">Forgot password?</button>
+    <button type="submit" class="btn-primary">Login</button>
+
+    <p class="switch-link">Don't have an account?
+      <button type="button" id="link-to-register">Register</button>
+    </p>
+  </form>
+
+  <!-- Register Form -->
+  <form id="register-form" aria-labelledby="registerTitle" novalidate>
+    <h2 id="registerTitle">Register</h2>
+
+    <label for="register-name">Full Name</label>
+    <input type="text" id="register-name" name="name" autocomplete="name" placeholder="John Doe" required aria-required="true" minlength="2" />
+    <div class="error-message" id="register-name-error">Please enter your name (at least 2 letters).</div>
+
+    <label for="register-email">Email</label>
+    <input type="email" id="register-email" name="email" autocomplete="email" placeholder="you@example.com" required aria-required="true" />
+    <div class="error-message" id="register-email-error">Please enter a valid email address.</div>
+
+    <label for="register-password">Password</label>
+    <div class="password-wrapper">
+      <input type="password" id="register-password" name="password" placeholder="Enter password" minlength="6" required aria-required="true" autocomplete="new-password"/>
+      <button type="button" class="password-toggle" aria-label="Toggle password visibility" aria-pressed="false">&#128065;</button>
+    </div>
+    <div class="error-message" id="register-password-error">Password must be at least 6 characters.</div>
+
+    <label for="register-password-confirm">Confirm Password</label>
+    <div class="password-wrapper">
+      <input type="password" id="register-password-confirm" name="password_confirm" placeholder="Confirm password" minlength="6" required aria-required="true" autocomplete="new-password"/>
+      <button type="button" class="password-toggle" aria-label="Toggle password visibility" aria-pressed="false">&#128065;</button>
+    </div>
+    <div class="error-message" id="register-password-confirm-error">Passwords do not match.</div>
+
+    <div class="error-message" id="register-email-exists-error">Email already registered.</div>
+
+    <button type="submit" class="btn-primary">Register</button>
+
+    <p class="switch-link">Already have an account?
+      <button type="button" id="link-to-login">Login</button>
+    </p>
+  </form>
+
+  <!-- Forgot Password Form -->
+  <form id="forgot-form" aria-labelledby="forgotTitle" novalidate>
+    <h2 id="forgotTitle">Reset Password</h2>
+
+    <p style="margin-bottom: 1.5rem; color: #6b7280; font-size: 0.95rem;">
+      Enter your email address and we'll send you a link to reset your password.
+    </p>
+
+    <label for="forgot-email">Email</label>
+    <input type="email" id="forgot-email" name="email" autocomplete="email" placeholder="you@example.com" required aria-required="true" />
+    <div class="error-message" id="forgot-email-error">Please enter a valid email address.</div>
+    <div class="error-message" id="forgot-email-notfound-error">Email not found.</div>
+
+    <button type="submit" class="btn-primary">Send Reset Link</button>
+
+    <p class="switch-link">Remembered your password?
+      <button type="button" id="link-to-login-back">Login</button>
+    </p>
+  </form>
+
+</div>
+
+<script>
+  (() => {
+    const DASHBOARD_URL = 'dashboard.html'; // Change to your actual dashboard URL
+
+    // Simple SHA-256 hash function for demonstration (async)
+    async function sha256(message) {
+      const msgBuffer = new TextEncoder().encode(message);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // User data management - store users in localStorage as JSON array of objects {name,email,passHash}
+    const STORAGE_KEY = 'auth-demo-users';
+
+    function getUsers() {
+      const usersJSON = localStorage.getItem(STORAGE_KEY);
+      return usersJSON ? JSON.parse(usersJSON) : [];
+    }
+
+    function saveUsers(users) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
+    }
+
+    // Select forms & links
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const forgotForm = document.getElementById('forgot-form');
+
+    const linkToRegister = document.getElementById('link-to-register');
+    const linkToLogin = document.getElementById('link-to-login');
+    const linkToForgot = document.getElementById('link-to-forgot');
+    const linkToLoginBack = document.getElementById('link-to-login-back');
+
+    const forms = [loginForm, registerForm, forgotForm];
+
+    function showForm(formToShow) {
+      forms.forEach(f => {
+        if (f === formToShow) {
+          f.classList.add('active');
+          f.querySelector('input, button[type="submit"]').focus();
+        } else {
+          f.classList.remove('active');
+        }
+      });
+      clearErrors();
+    }
+
+    function clearErrors() {
+      document.querySelectorAll('.error-message.active').forEach(el => el.classList.remove('active'));
+    }
+
+    // Form switching
+    linkToRegister.addEventListener('click', () => showForm(registerForm));
+    linkToLogin.addEventListener('click', () => showForm(loginForm));
+    linkToForgot.addEventListener('click', () => showForm(forgotForm));
+    linkToLoginBack.addEventListener('click', () => showForm(loginForm));
+
+    // Password visibility toggle
+    document.querySelectorAll('.password-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const pwInput = btn.previousElementSibling;
+        if (pwInput.type === 'password') {
+          pwInput.type = 'text';
+          btn.setAttribute('aria-pressed', 'true');
+        } else {
+          pwInput.type = 'password';
+          btn.setAttribute('aria-pressed', 'false');
+        }
+      });
+      btn.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          btn.click();
+        }
+      });
+    });
+
+    function validateEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email.toLowerCase());
+    }
+
+    // LOGIN form submission
+    loginForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      clearErrors();
+
+      const email = loginForm['email'].value.trim().toLowerCase();
+      const password = loginForm['password'].value.trim();
+
+      let valid = true;
+
+      if (!validateEmail(email)) {
+        document.getElementById('login-email-error').classList.add('active');
+        valid = false;
+      }
+      if (password.length < 6) {
+        document.getElementById('login-password-error').classList.add('active');
+        valid = false;
+      }
+      if (!valid) return;
+
+      const users = getUsers();
+      const user = users.find(u => u.email === email);
+      if (!user) {
+        document.getElementById('login-credentials-error').classList.add('active');
+        return;
+      }
+
+      const passHash = await sha256(password);
+      if (passHash !== user.passHash) {
+        document.getElementById('login-credentials-error').classList.add('active');
+        return;
+      }
+
+      // Save logged-in user to localStorage session (demo)
+      localStorage.setItem('auth-demo-currentUser', JSON.stringify({name:user.name,email:user.email}));
+
+      // Redirect to dashboard
+      window.location.href = DASHBOARD_URL;
+    });
+
+    // REGISTER form submission
+    registerForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      clearErrors();
+
+      const name = registerForm['name'].value.trim();
+      const email = registerForm['email'].value.trim().toLowerCase();
+      const password = registerForm['password'].value.trim();
+      const passwordConfirm = registerForm['password_confirm'].value.trim();
+
+      let valid = true;
+
+      if (name.length < 2) {
+        document.getElementById('register-name-error').classList.add('active');
+        valid = false;
+      }
+      if (!validateEmail(email)) {
+        document.getElementById('register-email-error').classList.add('active');
+        valid = false;
+      }
+      if (password.length < 6) {
+        document.getElementById('register-password-error').classList.add('active');
+        valid = false;
+      }
+      if (password !== passwordConfirm) {
+        document.getElementById('register-password-confirm-error').classList.add('active');
+        valid = false;
+      }
+      if (!valid) return;
+
+      const users = getUsers();
+      if (users.some(u => u.email === email)) {
+        document.getElementById('register-email-exists-error').classList.add('active');
+        return;
+      }
+
+      const passHash = await sha256(password);
+      const newUser = {name, email, passHash};
+      users.push(newUser);
+      saveUsers(users);
+
+      // Store current user session (demo)
+      localStorage.setItem('auth-demo-currentUser', JSON.stringify({name,email}));
+
+      // Redirect to dashboard after registration
+      window.location.href = DASHBOARD_URL;
+    });
+
+    // FORGOT password form submission (demo only)
+    forgotForm.addEventListener('submit', e => {
+      e.preventDefault();
+      clearErrors();
+
+      const email = forgotForm['email'].value.trim().toLowerCase();
+
+      if (!validateEmail(email)) {
+        document.getElementById('forgot-email-error').classList.add('active');
+        return;
+      }
+
+      const users = getUsers();
+      const user = users.find(u => u.email === email);
+      if (!user) {
+        document.getElementById('forgot-email-notfound-error').classList.add('active');
+        return;
+      }
+
+      alert(`Password reset link sent to ${email} (Demo. No actual email is sent.)`);
+      forgotForm.reset();
+      showForm(loginForm);
+    });
+
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Goods Recording Dashboard</title>
+<link rel="icon" href="untitled.jpg">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+  * {
+    box-sizing: border-box;
+  }
+  body, html {
+    margin: 0; padding: 0; height: 100%;
+    font-family: 'Inter', sans-serif;
+    background: #f0f2f5;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 240px;
+    background: #1f2937;
+    color: white;
+    flex-shrink: 0;
+    padding-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+  }
+  .sidebar.collapsed {
+    transform: translateX(-240px);
+  }
+  .sidebar h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    font-size: 1.5rem;
+    user-select: none;
+  }
+  .nav-link {
+    padding: 1rem 1.5rem;
+    display: block;
+    color: #cbd5e0;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    border-left: 4px solid transparent;
+    transition: background 0.2s, border-color 0.2s;
+    user-select: none;
+  }
+  .nav-link:hover {
+    background: #374151;
+    color: #e0e7ff;
+  }
+  .nav-link.active {
+    background: #4f46e5;
+    color: white;
+    border-left-color: #818cf8;
+  }
+
+  /* Header */
+  header {
+    background: white;
+    height: 60px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    flex-shrink: 0;
+    width: 100%;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+  }
+  .hamburger {
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: #1f2937;
+    display: none;
+    user-select: none;
+  }
+  .header-title {
+    margin-left: 1rem;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #1f2937;
+    user-select: none;
+  }
+
+  /* Main content */
+  main {
+    flex: 1;
+    padding: 80px 20px 20px 20px;
+    overflow-y: auto;
+    height: 100vh;
+    background: #f0f2f5;
+  }
+  section {
+    max-width: 900px;
+    margin: auto;
+  }
+  h1, h2 {
+    color: #1f2937;
+  }
+
+  /* Forms */
+  form {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 500px;
+  }
+  label {
+    font-weight: 600;
+    color: #374151;
+  }
+  input[type="text"],
+  input[type="number"],
+  select {
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: 1.5px solid #d1d5db;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+  }
+  input[type="text"]:focus,
+  input[type="number"]:focus,
+  select:focus {
+    outline: none;
+    border-color: #6366f1;
+    background: #f9fafb;
+  }
+  button {
+    background: #4f46e5;
+    border: none;
+    border-radius: 50px;
+    padding: 0.9rem 1.5rem;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(79,70,229,0.5);
+    transition: background 0.3s ease;
+    user-select: none;
+  }
+  button:hover {
+    background: #4338ca;
+  }
+  .message {
+    margin-top: 0.3rem;
+    font-weight: 600;
+  }
+  .message.error {
+    color: #dc2626;
+  }
+  .message.success {
+    color: #16a34a;
+  }
+
+  /* Tables */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    overflow: hidden;
+    margin-top: 1rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    color: #374151;
+  }
+  th {
+    background: #f3f4f6;
+    font-weight: 700;
+  }
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* Charts container */
+  #charts {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+    justify-content: space-around;
+  }
+  canvas {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    max-width: 450px;
+    width: 100%;
+  }
+/* Dashboard Welcome Section */
+  #dashboard-home h2 {
+    color: #2563eb;
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  #dashboard-home p {
+    font-size: 1.1rem;
+    color: #374151;
+  }
+
+  /* User info & logout */
+  #user-info {
+    margin-bottom: 3rem;
+    margin-right:  90px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #4b5563;
+  }
+
+  #logout-btn {
+    background-color: #ef4444;
+    border: none;
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: background 0.3s ease;
+    margin-bottom: 3rem;
+  }
+  #logout-btn:hover,
+  #logout-btn:focus {
+    background-color: #b91c1c;
+    outline: none;
+  }
+
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .sidebar {
+      position: fixed;
+      top: 60px;
+      left: 0;
+      height: calc(100% - 60px);
+      transform: translateX(-240px);
+      z-index: 200;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.15);
+    }
+    .sidebar.open {
+      transform: translateX(0);
+    }
+    .hamburger {
+      display: block;
+    }
+    main {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+  }
+ .but{
+margin-left: 150px;
+ margin-top: 10px;
+}
+.bu{
+margin-left: 100px;
+ margin-top: -28px;
+}
+ 
+
+  tbody tr:hover {
+    background: #e0e7ff;
+  }
+  button.delete-btn {
+    background: #ef4444;
+    border: none;
+    color: white;
+    padding: 0.3rem 0.7rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+  }
+  button.delete-btn:hover,
+  button.delete-btn:focus {
+    background-color: #b91c1c;
+    outline: none;
+  }
+</style>
+</head>
+<body>
+  <nav class="sidebar" aria-label="Sidebar navigation" id="sidebar">
+    <h2>GoodsApp</h2>
+    <a href="#" class="nav-link active" data-page="home" tabindex="0">Home</a>
+    <a href="#" class="nav-link" data-page="add" tabindex="0">Add Goods</a>
+    <a href="#" class="nav-link" data-page="records" tabindex="0">Records</a>
+    <a href="#" class="nav-link" data-page="charts" tabindex="0">Charts</a>
+    <a href="#" class="nav-link" data-page="logout" tabindex="0">Logout</a>
+  </nav>
+
+  <header>
+    <span class="hamburger" id="hamburger" aria-label="Toggle sidebar" role="button" tabindex="0">&#9776;</span>
+    <span class="header-title" id="headerTitle">Home</span>
+  <div class="but">
+<span class="user-info" aria-live="polite" aria-atomic="true">Hello, <strong id="user-name"></strong></span>
+      
+ </div>
+</header>
+  <main>
+    <!-- Home: Show goods recorded today -->
+    <section id="home" class="page">
+      <h2>Goods Recorded Today</h2>
+      <table aria-label="Goods recorded today table">
+        <thead>
+          <tr><th>Goods Name</th><th>Category</th><th>Quantity</th><th>Recorded Time</th> </tr>
+        </thead>
+        <tbody id="todayRecordsTableBody">
+          <!-- Today's goods will show here -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Add Goods -->
+    <section id="add" class="page" hidden>
+      <h2>Add New Goods</h2>
+      <form id="goodsForm" novalidate>
+        <label for="goodsName">Goods Name *</label>
+        <input type="text" id="goodsName" name="goodsName" required placeholder="Amount" autocomplete="off" />
+
+ 
+        <label for="goodsCategory">Category *</label>
+        <select id="goodsCategory" name="goodsCategory" required>
+          <option value="" disabled selected>Select category</option>
+          <option value="Food">Food</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Clothing">Clothing</option>
+          <option value="Household">Household</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <label for="goodsQuantity">Quantity *</label>
+        <input type="number" id="goodsQuantity" name="goodsQuantity" min="1" value="1" required />
+
+        <button type="submit">Add Goods</button>
+        <div class="message" id="formMessage" aria-live="polite"></div>
+      </form>
+    </section>
+
+    <!-- Records: Show ALL goods -->
+    <section id="records" class="page" hidden>
+      <h2>All Recorded Goods</h2>
+      <table aria-label="All recorded goods table">
+        <thead>
+          <tr><th>Goods Name</th><th>Category</th><th>Quantity</th><th>Recorded Time</th></tr>
+        
+</thead>
+        <tbody id="allRecordsTableBody">
+          <!-- All goods records will show here -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Charts -->
+    <section id="charts" class="page" hidden>
+      <h2>Goods Charts (All Records)</h2>
+      <div id="charts">
+        <div>
+          <canvas id="barChart" aria-label="Bar chart of goods quantities"></canvas>
+        </div>
+        <div>
+          <canvas id="pieChart" aria-label="Pie chart of goods categories"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Logout -->
+    <section id="logout" class="page" hidden>
+      <h2> Are you sure that you want to Logout?</h2>
+<a href="login.html"><button>Logout</button><a/>
+       
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    (() => {
+      const sidebar = document.getElementById('sidebar');
+      const hamburger = document.getElementById('hamburger');
+      const headerTitle = document.getElementById('headerTitle');
+      const navLinks = sidebar.querySelectorAll('.nav-link');
+      const pages = document.querySelectorAll('.page');
+      const form = document.getElementById('goodsForm');
+      const formMessage = document.getElementById('formMessage');
+      const todayRecordsTableBody = document.getElementById('todayRecordsTableBody');
+      const allRecordsTableBody = document.getElementById('allRecordsTableBody');
+
+      const STORAGE_KEY = 'goodsData';
+
+      let goodsData = [];
+
+      // Chart instances
+      let barChart = null;
+      let pieChart = null;
+
+      // Hamburger toggle for small screens
+      hamburger.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+      });
+
+      // Close sidebar clicking outside on small screen
+      document.addEventListener('click', e => {
+        if (!sidebar.contains(e.target) && !hamburger.contains(e.target) && sidebar.classList.contains('open')) {
+          sidebar.classList.remove('open');
+        }
+      });
+
+      // Navigation clicks
+      navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const page = link.getAttribute('data-page');
+          if (page === 'logout') {
+            logout();
+            return;
+          }
+          setActivePage(page);
+          if (sidebar.classList.contains('open')) {
+            sidebar.classList.remove('open'); // close sidebar on mobile
+          }
+        });
+      });
+	
+
+
+      function setActivePage(page) {
+        pages.forEach(p => {
+          p.hidden = p.id !== page;
+        });
+        navLinks.forEach(link => {
+          if (link.getAttribute('data-page') === page) {
+            link.classList.add('active');
+          } else {
+            link.classList.remove('active');
+          }
+        });
+        headerTitle.textContent = page.charAt(0).toUpperCase() + page.slice(1);
+        if (page === 'home') {
+          renderTodayRecordsTable();
+        } else if (page === 'records') {
+          renderAllRecordsTable();
+        } else if (page === 'charts') {
+          updateCharts();
+        }
+      }
+
+      // Load goods data from localStorage
+      function loadGoods() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        goodsData = raw ? JSON.parse(raw) : [];
+      }
+      // Save goods data to localStorage
+      function saveGoods() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(goodsData));
+      }
+
+      // Add goods item with current datetime
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        formMessage.textContent = '';
+        formMessage.className = 'message';
+
+        const name = form.goodsName.value.trim();
+        const category = form.goodsCategory.value;
+        const quantity = Number(form.goodsQuantity.value);
+
+        if (!name || !category || !(quantity > 0)) {
+          formMessage.textContent = 'Please fill all fields with valid data.';
+          formMessage.classList.add('error');
+          return;
+        }
+
+        const nowISO = new Date().toISOString();
+
+        goodsData.push({ name, category, quantity, recordedAt: nowISO });
+        saveGoods();
+        formMessage.textContent = 'Goods added successfully!';
+        formMessage.classList.add('success');
+        form.reset();
+      });
+
+      // Helper to check if date is today
+      function isToday(dateString) {
+        const d = new Date(dateString);
+        const now = new Date();
+        return d.getFullYear() === now.getFullYear() &&
+               d.getMonth() === now.getMonth() &&
+               d.getDate() === now.getDate();
+      }
+
+      // Format ISO datetime nicely
+      function formatDateTime(isoString) {
+        const d = new Date(isoString);
+        return d.toLocaleString([], {
+          year: 'numeric', month: 'short', day: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        });
+      }
+
+      // Render today's records table
+      function renderTodayRecordsTable() {
+        const todayGoods = goodsData.filter(item => isToday(item.recordedAt));
+        if (todayGoods.length === 0) {
+          todayRecordsTableBody.innerHTML = "<tr><td colspan='4' style='text-align:center; color:#777;'>No goods recorded today.</td></tr>";
+          return;
+        }
+        todayRecordsTableBody.innerHTML = todayGoods.map(item =>
+          `<tr>
+            <td>${escapeHtml(item.name)}</td>
+            <td>${escapeHtml(item.category)}</td>
+            <td>${item.quantity}</td>
+            <td>${formatDateTime(item.recordedAt)}</td>
+          </tr>`).join('');
+      }
+
+      // Render all records table
+      function renderAllRecordsTable() {
+        if (goodsData.length === 0) {
+          allRecordsTableBody.innerHTML = "<tr><td colspan='4' style='text-align:center; color:#777;'>No goods recorded yet.</td></tr>";
+          return;
+        }
+        allRecordsTableBody.innerHTML = goodsData.map(item =>
+          `<tr>
+            <td>${escapeHtml(item.name)}</td>
+            <td>${escapeHtml(item.category)}</td>
+            <td>${item.quantity}</td>
+            <td>${formatDateTime(item.recordedAt)}</td>
+          </tr>`).join('');
+      }
+
+      // Update charts (with all goods data)
+      function updateCharts() {
+        // Aggregate quantity by goods name
+        const quantityByName = {};
+        goodsData.forEach(item => {
+          quantityByName[item.name] = (quantityByName[item.name] || 0) + item.quantity;
+        });
+        const barLabels = Object.keys(quantityByName);
+        const barData = barLabels.map(name => quantityByName[name]);
+
+        // Aggregate quantity by category
+        const quantityByCategory = {};
+        goodsData.forEach(item => {
+          quantityByCategory[item.category] = (quantityByCategory[item.category] || 0) + item.quantity;
+        });
+        const pieLabels = Object.keys(quantityByCategory);
+        const pieData = pieLabels.map(cat => quantityByCategory[cat]);
+
+        // Bar chart
+        const barCtx = document.getElementById('barChart').getContext('2d');
+        if (barChart) {
+          barChart.data.labels = barLabels;
+          barChart.data.datasets[0].data = barData;
+          barChart.update();
+        } else {
+          barChart = new Chart(barCtx, {
+            type: 'bar',
+            data: {
+              labels: barLabels,
+              datasets: [{
+                label: 'Quantity',
+                data: barData,
+                backgroundColor: 'rgba(79,70,229,0.7)',
+                borderColor: 'rgba(79,70,229,1)',
+                borderWidth: 1,
+                borderRadius: 6
+              }]
+            },
+            options: {
+              responsive: true,
+              scales: {
+                y: { beginAtZero: true },
+              },
+              plugins: {
+                legend: { display: false }
+              }
+            }
+          });
+        }
+
+        // Pie chart
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        if (pieChart) {
+          pieChart.data.labels = pieLabels;
+          pieChart.data.datasets[0].data = pieData;
+          pieChart.update();
+        } else {
+          const colors = ['#4f46e5','#6366f1','#818cf8','#a5b4fc','#c7d2fe','#e0e7ff'];
+          pieChart = new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+              labels: pieLabels,
+              datasets: [{
+                data: pieData,
+                backgroundColor: colors.slice(0, pieLabels.length),
+                borderColor: '#fff',
+                borderWidth: 2,
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: {
+                  position: 'bottom'
+                }
+              }
+            }
+          });
+        }
+      }
+
+      // Simple HTML escape for safety
+      function escapeHtml(text) {
+        if (!text) return '';
+        return text.replace(/&/g, "&amp;")
+                   .replace(/</g, "&lt;")
+                   .replace(/>/g, "&gt;")
+                   .replace(/"/g, "&quot;")
+                   .replace(/'/g, "&#039;");
+      }
+
+      // Simulate logout
+      function logout() {
+        setActivePage('logout');
+      }
+
+      // Initialize app
+      function init() {
+        const rawData = localStorage.getItem(STORAGE_KEY);
+        goodsData = rawData ? JSON.parse(rawData) : [];
+        setActivePage('home');
+      }
+
+      init();
+    })();
+
+
+
+
+
+
+(function() {
+    const USER_KEY = 'auth-demo-currentUser';
+    const GOODS_KEY = 'auth-demo-goods';
+
+    // Elements
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+
+    const navButtons = {
+      home: document.getElementById('nav-home'),
+      addGoods: document.getElementById('nav-add'),
+      records: document.getElementById('nav-records'),
+      charts: document.getElementById('nav-charts'),
+      logout: document.getElementById('logout-btn')
+    };
+
+    const sections = {
+      home: document.getElementById('dashboard-home'),
+      addGoods: document.getElementById('record-form'),
+      records: document.getElementById('table-section'),
+      charts: document.getElementById('charts-section'),
+    };
+
+    // Check logged in user
+    const currentUserJSON = localStorage.getItem(USER_KEY);
+    let currentUser;
+    try {
+      currentUser = currentUserJSON ? JSON.parse(currentUserJSON) : null;
+    } catch {
+      currentUser = null;
+    }
+    if (!currentUser || !currentUser.name) {
+      window.location.href = 'login.html'; // adjust to your login page path
+      return;
+    }
+
+    // Insert user name in home section
+    document.getElementById('user-name').textContent = currentUser.name;
+
+    // Logout button
+    navButtons.logout.addEventListener('click', () => {
+      localStorage.removeItem(USER_KEY);
+      window.location.href = 'index.html'; // adjust to your login page path
+    });
+
+    // Sidebar toggle on small screens
+    sidebarToggle.addEventListener('click', () => {
+      const expanded = sidebarToggle.getAttribute('aria-expanded') === 'true' || false;
+      sidebarToggle.setAttribute('aria-expanded', !expanded);
+      sidebar.classList.toggle('collapsed');
+      if (!expanded) {
+        // Focus first nav button when opening sidebar
+        navButtons.home.focus();
+      } else {
+        sidebarToggle.focus();
+      }
+    });
+
+    // Hide sidebar on click outside (small screens)
+    document.addEventListener('click', e => {
+  if (window.innerWidth <= 768) {
+    // If clicked outside sidebar and not on hamburger button
+    const clickedInsideSidebar = sidebar.contains(e.target);
+    const clickedOnHamburger = e.target === sidebarToggleTop || sidebarToggleTop.contains(e.target);
+
+    if (!clickedInsideSidebar && !clickedOnHamburger) {
+      // ONLY close sidebar, do NOT open or toggle
+      sidebar.classList.add('collapsed');
+      sidebarToggleTop.setAttribute('aria-expanded', false);
+    }
+  }
+});
+
+    // Helper: clear active state from nav and hide all sections
+    function clearActive() {
+      Object.values(navButtons).forEach(btn => btn.classList.remove('active'));
+      Object.values(sections).forEach(sec => sec.classList.remove('active'));
+    }
+
+    // Show selected section & mark nav active
+    function showSection(sectionKey) {
+      clearActive();
+      navButtons[sectionKey].classList.add('active');
+      sections[sectionKey].classList.add('active');
+      sections[sectionKey].focus();
+
+      // If sidebar is open in mobile, close it after selection
+      if (window.innerWidth <= 768) {
+        sidebar.classList.add('collapsed');
+        sidebarToggle.setAttribute('aria-expanded', false);
+        sidebarToggle.focus();
+      }
+    }
+
+    // Setup nav button clicks
+    navButtons.home.addEventListener('click', () => showSection('home'));
+    navButtons.addGoods.addEventListener('click', () => showSection('addGoods'));
+    navButtons.records.addEventListener('click', () => showSection('records'));
+    navButtons.charts.addEventListener('click', () => showSection('charts'));
+
+    // Set initial view to home
+    showSection('home');
+
+    // -- Goods Data Management --
+
+    function loadGoods() {
+      const goodsJSON = localStorage.getItem(GOODS_KEY);
+      return goodsJSON ? JSON.parse(goodsJSON) : [];
+    }
+    function saveGoods(goods) {
+      localStorage.setItem(GOODS_KEY, JSON.stringify(goods));
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      const d = new Date(dateStr + 'T00:00:00');
+      return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    // Goods Table render and update charts
+    const tableBody = document.getElementById('goods-table-body');
+
+    function renderTable(goods) {
+      tableBody.innerHTML = '';
+      if (goods.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#6b7280; padding:1rem;">No goods recorded yet.</td></tr>`;
+        return;
+      }
+      goods.forEach((item, index) => {
+        const tr = document.createElement('tr');
+
+        const nameTd = document.createElement('td');
+        nameTd.textContent = item.name;
+        tr.appendChild(nameTd);
+
+        const qtyTd = document.createElement('td');
+        qtyTd.textContent = item.quantity;
+        tr.appendChild(qtyTd);
+
+        const dateTd = document.createElement('td');
+        dateTd.textContent = formatDate(item.date);
+        tr.appendChild(dateTd);
+
+        const actionsTd = document.createElement('td');
+        const delBtn = document.createElement('button');
+        delBtn.textContent = 'Delete';
+        delBtn.classList.add('delete-btn');
+        delBtn.setAttribute('aria-label', `Delete record of ${item.name} quantity ${item.quantity} date ${formatDate(item.date)}`);
+        delBtn.addEventListener('click', () => {
+          if (confirm(`Are you sure you want to delete the record for "${item.name}"?`)) {
+            goods.splice(index,1);
+            saveGoods(goods);
+            renderTable(goods);
+            updateCharts(goods);
+          }
+        });
+        actionsTd.appendChild(delBtn);
+        tr.appendChild(actionsTd);
+
+        tableBody.appendChild(tr);
+      });
+    }
+
+    // Charts setup and update
+    let barChart = null;
+    let pieChart = null;
+
+    function updateCharts(goods) {
+      const quantities = {};
+      goods.forEach(({name, quantity}) => {
+        quantities[name] = (quantities[name] || 0) + Number(quantity);
+      });
+
+      const labels = Object.keys(quantities);
+      const data = Object.values(quantities);
+
+      if (barChart) {
+        barChart.data.labels = labels;
+        barChart.data.datasets[0].data = data;
+        barChart.update();
+      } else {
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        barChart = new Chart(ctxBar, {
+          type: 'bar',
+          data: {
+            labels,
+            datasets: [{
+              label: 'Quantity',
+              data,
+              backgroundColor: '#2563eb',
+              borderRadius: 5,
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+              tooltip: { enabled: true }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { stepSize: 1 }
+              }
+            }
+          }
+        });
+      }
+
+      if (pieChart) {
+        pieChart.data.labels = labels;
+        pieChart.data.datasets[0].data = data;
+        pieChart.update();
+      } else {
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        pieChart = new Chart(ctxPie, {
+          type: 'pie',
+          data: {
+            labels,
+            datasets: [{
+              data,
+              backgroundColor: [
+                '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd',
+                '#f87171', '#ef4444', '#dc2626', '#b91c1c',
+                '#fbbf24', '#f59e0b'
+              ],
+              borderWidth: 1,
+              borderColor: '#fff',
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: { boxWidth: 12, padding: 12 }
+              },
+              tooltip: { enabled: true }
+            },
+          }
+        });
+      }
+    }
+
+    // Form handling
+    const form = document.getElementById('goods-form');
+    const dateInput = form.querySelector('#goods-date');
+    const todayISO = new Date().toISOString().split('T')[0];
+    dateInput.setAttribute('max', todayISO);
+
+    function clearForm() {
+      form.reset();
+      dateInput.value = todayISO;
+      form['goods-name'].focus();
+    }
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+
+      const nameInput = form['goods-name'].value.trim();
+      const quantityInput = Number(form['goods-quantity'].value);
+      const dateInputVal = form['goods-date'].value;
+
+      if (!nameInput) {
+        alert('Please enter goods name.');
+        form['goods-name'].focus();
+        return;
+      }
+      if (!quantityInput || quantityInput < 1) {
+        alert('Please enter a valid quantity (minimum 1).');
+        form['goods-quantity'].focus();
+        return;
+      }
+      if (!dateInputVal) {
+        alert('Please select a date.');
+        form['goods-date'].focus();
+        return;
+      }
+      if (dateInputVal > todayISO) {
+        alert('Date cannot be in the future.');
+        form['goods-date'].focus();
+        return;
+      }
+
+      const goods = loadGoods();
+
+      goods.push({
+        name: nameInput,
+        quantity: quantityInput,
+        date: dateInputVal
+      });
+      saveGoods(goods);
+      renderTable(goods);
+      updateCharts(goods);
+      clearForm();
+    });
+
+    // Initial load
+    document.addEventListener('DOMContentLoaded', () => {
+      dateInput.value = todayISO;
+      const goods = loadGoods();
+      renderTable(goods);
+      updateCharts(goods);
+    });
+
+  })(); 
+  </script>
+</body>
+</html>
+
